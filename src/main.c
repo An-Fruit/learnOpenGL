@@ -11,8 +11,7 @@ const unsigned int SCR_HEIGHT = 600;
 
 int main()
 {
-    // glfw: initialize and configure
-    // ------------------------------
+    // glfw: initialize to context version 3.3
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -23,7 +22,6 @@ int main()
 #endif
 
     // glfw window creation
-    // --------------------
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
     if (window == NULL)
     {
@@ -35,24 +33,81 @@ int main()
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     // glad: load all OpenGL function pointers
-    // ---------------------------------------
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         printf("Failed to load all OpenGL function pointers\n");
+        glfwTerminate();
         return -1;
     }    
 
-    // render loop
-    // -----------
+    const char *vertexShaderSource =    "#version 330 core\n"
+                                        "layout (location = 0) in vec3 aPos;\n"
+                                        "void main(){\n"
+                                        "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+                                        "}\0";
+
+    const char *fragmentShaderSource =  "#version 330 core\n"
+                                        "out vec4 FragColor;\n"
+                                        "void main(){\n"
+                                        "FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+                                        "}\0";
+
+    
+    //compile and link vertex and fragment shader
+    int success;
+    char infoLog[512];
+    
+
+    unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    glCompileShader(vertexShader);
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    if(!success){
+        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+        printf("ERROR: FAILED TO COMPILE VERTEX SHADER\n%s", infoLog);
+        glfwTerminate();
+        return -1;
+    }
+
+    unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    glCompileShader(fragmentShader);
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    if(!success){
+        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+        printf("ERROR: FAILED TO COMPILE FRAGMENT SHADER\n%s", infoLog);
+        glfwTerminate();
+        return -1;
+    }
+
+    unsigned int shaderProgram = glCreateProgram();
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glLinkProgram(shaderProgram);
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    if(!success){
+        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        printf("ERROR: SHADER PROGRAM LINKING FAILED");
+        glfwTerminate();
+        return -1;
+    }
+
+    //delete the unused shaders
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+
+    // all intialization of window/context and shaders completed
+
+    //
+
+    //render loop
     while (!glfwWindowShouldClose(window))
     {
-        // input
-        // -----
+        //get user input
         processInput(window);
 
         // render
-        // ------
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.2f, 0.3f, 0.3f, .5f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
