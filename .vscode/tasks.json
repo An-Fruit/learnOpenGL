@@ -20,7 +20,7 @@
                 "cwd": "${workspaceFolder}"
             },
             "problemMatcher": [
-                "$g++"  //compiler in use
+                "$gcc"
             ],
             "group": {
                 "kind": "build",
