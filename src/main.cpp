@@ -105,17 +105,13 @@ int main()
 
     // all intialization of window/context and shaders completed
 
-    float firstTriangle[] = {        //triangle 1
-        -0.5f,  0.5f,  0.0f,    //center top
-        -1.0f, -0.5f,  0.0f,    //bottom left
-         0.0f, -0.5f,  0.0f,    //bottom right
+    float firstTriangle[] = {
+        //positions           //colors
+         0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,   //bottom right
+        -0.5f, -0.5f,  0.0f,  0.0f,  1.0f,  0.0f,   //bottom left
+         0.0f,  0.5f,  0.0f,  0.0f,  0.0f,  1.0f    //top mid
     };
 
-    float secondTriangle[] = {        //triangle 2
-         0.5f,  0.5f,  0.0f,     //center top
-         0.0f, -0.25f, 0.0f,     //bottom left
-         1.0f, -0.25f, 0.0f      //bottom right
-    };
 
     unsigned int VBOs[2], VAOs[2];
     glGenVertexArrays(2, VAOs); //generate multiple VAOs or buffers at the same time
@@ -125,18 +121,19 @@ int main()
     glBindVertexArray(VAOs[0]);
     glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(firstTriangle), firstTriangle, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);	// Vertex attributes stay the same
+
+    //position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    //color attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+
     glEnableVertexAttribArray(0);
     // glBindVertexArray(0); // no need to unbind at all as we directly bind a different VAO the next few lines
-    // second triangle setup
-    // ---------------------
-    glBindVertexArray(VAOs[1]);	// note that we bind to a different VAO now
-    glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]);	// and a different VBO
-    glBufferData(GL_ARRAY_BUFFER, sizeof(secondTriangle), secondTriangle, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);   // because the vertex data is tightly packed we can
-                                                                    // also specify 0 as the vertex attribute's stride to let
-                                                                    // OpenGL figure it out
-    glEnableVertexAttribArray(0);
+
     // glBindVertexArray(0);    // not really necessary as well, but beware of calls that could
                                 // affect VAOs while this one is bound 
                                 //(like binding element buffer objects, or enabling/disabling vertex attributes)
