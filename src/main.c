@@ -141,7 +141,8 @@ int main()
         //draw 2 triangles
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        // glPolygonMode(GL_FRONT, GL_LINE); //wireframe mode
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
