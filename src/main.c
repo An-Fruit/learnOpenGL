@@ -51,7 +51,11 @@ int main()
                                         "void main(){\n"
                                         "FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
                                         "}\0";
-
+    const char *yellowFragShaderSource =    "#version 330 core\n"
+                                            "out vec4 FragColor;\n"
+                                            "void main(){\n"
+                                            "FragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);\n"
+                                            "}\0";
     
     //compile and link vertex and fragment shader
     int success;
@@ -80,6 +84,17 @@ int main()
         return -1;
     }
 
+    unsigned int yellowFragShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(yellowFragShader, 1, &yellowFragShaderSource, NULL);
+    glCompileShader(yellowFragShader);
+    glGetShaderiv(yellowFragShader, GL_COMPILE_STATUS, &success);
+    if(!success){
+        glGetShaderInfoLog(yellowFragShader, 512, NULL, infoLog);
+        printf("ERROR: FAILED TO COMPILE YELLOW FRAGMENT SHADER\n%s", infoLog);
+        glfwTerminate();
+        return -1;
+    }
+
     unsigned int shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, vertexShader);
     glAttachShader(shaderProgram, fragmentShader);
@@ -92,9 +107,22 @@ int main()
         return -1;
     }
 
+    unsigned int yellowShaderProg = glCreateProgram();
+    glAttachShader(yellowShaderProg, vertexShader);
+    glAttachShader(yellowShaderProg, yellowFragShader);
+    glLinkProgram(yellowShaderProg);
+    glGetProgramiv(yellowShaderProg, GL_LINK_STATUS, &success);
+    if(!success){
+        glGetProgramInfoLog(yellowShaderProg, 512, NULL, infoLog);
+        printf("ERROR: YELLOW SHADER PROGRAM LINKING FAILED");
+        glfwTerminate();
+        return -1;
+    }
+
     //delete the unused shaders
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
+    glDeleteShader(yellowFragShader);
 
     // all intialization of window/context and shaders completed
 
@@ -155,6 +183,7 @@ int main()
         glBindVertexArray(VAOs[0]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         // then we draw the second triangle using the data from the second VAO
+        glUseProgram(yellowShaderProg);
         glBindVertexArray(VAOs[1]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
  
