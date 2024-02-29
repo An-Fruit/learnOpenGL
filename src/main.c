@@ -98,52 +98,66 @@ int main()
 
     // all intialization of window/context and shaders completed
 
-    float vertices[] = {        //triangle 1
+    float firstTriangle[] = {        //triangle 1
         -0.5f,  0.5f,  0.0f,    //center top
         -1.0f, -0.5f,  0.0f,    //bottom left
          0.0f, -0.5f,  0.0f,    //bottom right
+    };
 
-                                //triangle 2
-         0.5f,  0.5f, 0.0f,     //center top
+    float secondTriangle[] = {        //triangle 2
+         0.5f,  0.5f,  0.0f,     //center top
          0.0f, -0.25f, 0.0f,     //bottom left
          1.0f, -0.25f, 0.0f      //bottom right
     };
 
-    unsigned int VBO, VAO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    unsigned int VBOs[2], VAOs[2];
+    glGenVertexArrays(2, VAOs); // we can also generate multiple VAOs or buffers at the same time
+    glGenBuffers(2, VBOs);
+    // first triangle setup
+    // --------------------
+    glBindVertexArray(VAOs[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(firstTriangle), firstTriangle, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);	// Vertex attributes stay the same
     glEnableVertexAttribArray(0);
+    // glBindVertexArray(0); // no need to unbind at all as we directly bind a different VAO the next few lines
+    // second triangle setup
+    // ---------------------
+    glBindVertexArray(VAOs[1]);	// note that we bind to a different VAO now
+    glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]);	// and a different VBO
+    glBufferData(GL_ARRAY_BUFFER, sizeof(secondTriangle), secondTriangle, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);   // because the vertex data is tightly packed we can
+                                                                    // also specify 0 as the vertex attribute's stride to let
+                                                                    // OpenGL figure it out
+    glEnableVertexAttribArray(0);
+    // glBindVertexArray(0);    // not really necessary as well, but beware of calls that could
+                                // affect VAOs while this one is bound 
+                                //(like binding element buffer objects, or enabling/disabling vertex attributes)
 
-    //unbind GL_ARRAY_BUFFER to 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    glBindVertexArray(0);
 
 
+
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);   //uncomment to draw in wireframe mode
     //render loop
     while (!glfwWindowShouldClose(window))
     {
-        //get user input
+        // input
+        // -----
         processInput(window);
 
         // render
-        glClearColor(0.2f, 0.3f, 0.3f, .5f);
+        // ------
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        //draw 2 triangles
         glUseProgram(shaderProgram);
-        glBindVertexArray(VAO);
-        // glPolygonMode(GL_FRONT, GL_LINE); //wireframe mode
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
-
+        // draw first triangle using the data from the first VAO
+        glBindVertexArray(VAOs[0]);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        // then we draw the second triangle using the data from the second VAO
+        glBindVertexArray(VAOs[1]);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+ 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
@@ -151,8 +165,8 @@ int main()
     }
 
     //deallocate all glfw resources
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
+    glDeleteVertexArrays(2, VAOs);
+    glDeleteBuffers(2, VBOs);
     glDeleteProgram(shaderProgram);
 
 
