@@ -1,6 +1,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include<ctype.h>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -8,6 +11,24 @@ void processInput(GLFWwindow *window);
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 800;
+
+//shader source code
+    const char *vertexShaderSource =          "#version 330 core\n"
+                                        "layout (location = 0) in vec3 aPos;\n"
+                                        "void main(){\n"
+                                        "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+                                        "}\0";
+
+    const char *fragmentShaderSource =  "#version 330 core\n"
+                                        "out vec4 FragColor;\n"
+                                        "void main(){\n"
+                                        "FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+                                        "}\0";
+    const char *yellowFragShaderSource =    "#version 330 core\n"
+                                            "out vec4 FragColor;\n"
+                                            "void main(){\n"
+                                            "FragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);\n"
+                                            "}\0";
 
 int main()
 {
@@ -39,29 +60,16 @@ int main()
         glfwTerminate();
         return -1;
     }    
-
-    const char *vertexShaderSource =    "#version 330 core\n"
-                                        "layout (location = 0) in vec3 aPos;\n"
-                                        "void main(){\n"
-                                        "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-                                        "}\0";
-
-    const char *fragmentShaderSource =  "#version 330 core\n"
-                                        "out vec4 FragColor;\n"
-                                        "void main(){\n"
-                                        "FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-                                        "}\0";
-    const char *yellowFragShaderSource =    "#version 330 core\n"
-                                            "out vec4 FragColor;\n"
-                                            "void main(){\n"
-                                            "FragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);\n"
-                                            "}\0";
     
     //compile and link vertex and fragment shader
     int success;
     char infoLog[512];
     
-
+    if(!vertexShaderSource){
+        printf("FAILED TO READ IN VERTEX SHADER SRC CODE");
+        glfwTerminate();
+        return -1;
+    }
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
     glCompileShader(vertexShader);

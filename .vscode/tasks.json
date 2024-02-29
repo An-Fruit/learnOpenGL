@@ -4,13 +4,13 @@
         {
             "type": "cppbuild",
             "label": "C/C++: g++.exe build active file",
-            "command": "C:\\msys64\\mingw64\\bin\\gcc.exe", //path to compiler
+            "command": "C:\\msys64\\mingw64\\bin\\g++.exe", //path to compiler
             "args": [
                 "-g",
                 "-std=c++17",
                 "-I${workspaceFolder}/include",
                 "-L${workspaceFolder}/lib",
-                "${workspaceFolder}/src/main.c",
+                "${workspaceFolder}/src/main.cpp",
                 "${workspaceFolder}/src/glad.c",
                 "-lglfw3dll",
                 "-o",
@@ -20,13 +20,13 @@
                 "cwd": "${workspaceFolder}"
             },
             "problemMatcher": [
-                "$gcc"  //compiler in use
+                "$g++"  //compiler in use
             ],
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
-            "detail": "compiler: C:\\msys64\\mingw64\\bin\\gcc.exe" //path to compiler
+            "detail": "compiler: C:\\msys64\\mingw64\\bin\\g++.exe" //path to compiler
         }
     ]
 }
