@@ -59,31 +59,47 @@ int main()
          0.0f,  0.5f,  0.0f,  0.0f,  0.0f,  1.0f    //top mid
     };
 
+    //use this rect to cover entire screen
+    float rect[] = {
+        -1.0f, -1.0f,  0.5f,    //bottom left
+        -1.0f,  1.0f,  1.0f,    //top left
+         1.0f,  1.0f, -1.0f,    //top right
+         1.0f, -1.0f,  0.5f     //bottom right
+    };
+    unsigned int drawOrder[] = {
+        0, 1, 2,    //triangle one (top left)
+        0, 2, 3     //triangle two (bottom right)
+    };
 
-    unsigned int VBO, VAO;
+
+    unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
-    // set up info for 1st triangle
-    // --------------------
+    glGenBuffers(1, &EBO);
+
+    //set up info for rendering
+
+    //bind vertex array object
     glBindVertexArray(VAO);
+
+    //copy vertices array into vertex buffer object for openGL to use
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(firstTriangle), firstTriangle, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(rect), rect, GL_STATIC_DRAW);
 
-    //position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(drawOrder), drawOrder, GL_STATIC_DRAW);
+
+    //set vertex attribute pointers for position attribute (rectangle)
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    //color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
 
     glEnableVertexAttribArray(0);
-    // glBindVertexArray(0); // no need to unbind at all as we directly bind a different VAO the next few lines
 
-    // glBindVertexArray(0);    // not really necessary as well, but beware of calls that could
-                                // affect VAOs while this one is bound 
-                                //(like binding element buffer objects, or enabling/disabling vertex attributes)
+
+    glBindVertexArray(0);
+
+
 
 
 
@@ -105,9 +121,9 @@ int main()
         //render triangle
         //---------------
         myShader.use();
-        myShader.setFloat("horizOffset", 0.5f);
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        // glDrawArrays(GL_TRIANGLES, 0, 3);
 
         
  

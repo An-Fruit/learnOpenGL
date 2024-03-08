@@ -64,6 +64,11 @@ class Shader{
             glDeleteShader(vert);
             glDeleteShader(frag);
         }
+
+        /**
+         * Deconstructor for the shader.
+         * Removes all 
+        */
         ~Shader(){
             if(programID != 0){
                 glDeleteProgram(programID);

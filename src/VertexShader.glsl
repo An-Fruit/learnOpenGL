@@ -11,8 +11,8 @@ void main()
     float yPos = aPos.y;
     float zPos = aPos.z;
 
-    //normalize values to their absolute value so that we don't end up with black
-    //colors for everything
+    //absolute values for position
+    //use this for colors
     float absX = xPos < 0 ? -1 * xPos : xPos;
     float absY = yPos < 0 ? -1 * yPos : yPos;
     float absZ = zPos < 0 ? -1 * zPos : zPos;
