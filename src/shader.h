@@ -64,7 +64,12 @@ class Shader{
             glDeleteShader(vert);
             glDeleteShader(frag);
         }
-        
+        ~Shader(){
+            if(programID != 0){
+                glDeleteProgram(programID);
+                programID = 0;
+            }
+        }
         
         /**
          * @param vPath the path to the file w/ vertex shader source code
