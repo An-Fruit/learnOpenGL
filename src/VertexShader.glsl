@@ -19,4 +19,5 @@ void main()
 
     gl_Position = vec4(xPos, yPos, zPos, 1.0); // see how we directly give a vec3 to vec4's constructor
     ourColor = vec3(absX, absY, absZ);
+    // ourColor = aColor;
 }

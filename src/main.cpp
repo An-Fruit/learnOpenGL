@@ -14,8 +14,6 @@ void drawSierpinski(point_t a, point_t b, point_t c, int depth);
 void addSierpinskiPts(point_t a, point_t b, point_t c, int depth, std::vector<point_t>& points);
 void loadSierpinskiIntoBuffer(std::vector<point_t>& points, unsigned int VAO, unsigned int VBO);
 
-
-// settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 800;
 
@@ -207,6 +205,7 @@ void addSierpinskiPts(point_t a, point_t b, point_t c, int depth, std::vector<po
  * 
 */
 void loadSierpinskiIntoBuffer(std::vector<point_t>& points, unsigned int VAO, unsigned int VBO){
+    printf("\nLoading Sierpinski Vertices into VBO\n");
     size_t len = points.size();
     float vertices[len * 3];
     //add all elements into array so we can put it in the VBO
@@ -214,6 +213,11 @@ void loadSierpinskiIntoBuffer(std::vector<point_t>& points, unsigned int VAO, un
         vertices[3 * i] = points.at(i).x;
         vertices[3 * i + 1] = points.at(i).y;
         vertices[3 * i + 2] = points.at(i).z;
+    }
+    
+    printf("Vertices Array Contents: \n");
+    for(int i = 0; i < len * 3; i++){
+        printf("%.3f ", vertices[i]);
     }
 
     //store old buffer binding
@@ -232,7 +236,12 @@ void loadSierpinskiIntoBuffer(std::vector<point_t>& points, unsigned int VAO, un
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);   //TODO: see if putting this here works
     
-
+    printf("\nBuffer Contents\n");
+    float bufferItems[len * 3];
+    glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), bufferItems);
+    for(int i = 0; i < len * 3; i++){
+        printf("%.3f ", bufferItems[i]);
+    }
 
     //restore old buffer binding
     glBindBuffer(GL_ARRAY_BUFFER, oldBufferBinding);
