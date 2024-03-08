@@ -156,11 +156,17 @@ class Shader{
             switch(shaderType){
                 //check error for shader compilation
                 case GL_VERTEX_SHADER:
+                    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+                    if(!success){
+                        glGetShaderInfoLog(shader, 1024, NULL, log);
+                        printf("\nVERTEX SHADER COMPILATION ERROR:\n%s\n", log);
+                    }
+                    break;
                 case GL_FRAGMENT_SHADER:
                     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
                     if(!success){
                         glGetShaderInfoLog(shader, 1024, NULL, log);
-                        printf("\nSHADER COMPILATION ERROR:\n%s\n", log);
+                        printf("\nFRAGMENT SHADER COMPILATION ERROR:\n%s\n", log);
                     }
                     break;
 
