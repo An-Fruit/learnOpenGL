@@ -13,7 +13,7 @@
 #include<sstream>
 #include<string>
 
-#define SHADER_PROGRAM 0xDEADBEEF
+#define SHADER_PROGRAM 0xDEADBEEF   //random int value used for error handling
 
 class Shader{
     public:
@@ -67,7 +67,7 @@ class Shader{
 
         /**
          * Deconstructor for the shader.
-         * Removes all 
+         * Deletes the shader program when it goes out of scope
         */
         ~Shader(){
             if(programID != 0){
