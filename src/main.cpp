@@ -22,10 +22,10 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 800;
 const float vertices[] = {
         //position              //color
-         0.5f,  0.5f, 0.0f,     0.0f, 1.0f, 1.0f,      // top right
+         0.5f,  0.5f, 0.0f,     0.0f, .25f, .25f,      // top right
          0.5f, -0.5f, 0.0f,     0.0f, 1.0f, 1.0f,      // bottom right
         -0.5f, -0.5f, 0.0f,     0.0f, 1.0f, 1.0f,      // bottom left
-        -0.5f,  0.5f, 0.0f,     0.0f, 1.0f, 1.0f       // top left 
+        -0.5f,  0.5f, 0.0f,     0.0f, .25f, .25f       // top left 
 };
 
 const int drawOrder[] = {
@@ -64,31 +64,6 @@ int main()
     vbo1.unbind();
     ebo1.unbind();
 
-
-
-    // unsigned int VBO, VAO, EBO;
-    // glGenVertexArrays(1, &VAO);
-    // glGenBuffers(1, &VBO);
-    // glGenBuffers(1, &EBO);
-    // // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-    // glBindVertexArray(VAO);
-
-    // glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    // glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(drawOrder), drawOrder, GL_STATIC_DRAW);
-    // // position attribute
-    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-    // glEnableVertexAttribArray(0);
-    // // color attribute
-    // glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-    // glEnableVertexAttribArray(1);
-
-    // glBindBuffer(GL_ARRAY_BUFFER, 0);
-    // glBindVertexArray(0);
-    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);   //unbind EBO after unbinding VAO to prevent them from unbinding from each other
-
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);   //uncomment to draw in wireframe mode
     //render loop
     while (!glfwWindowShouldClose(window))
@@ -102,7 +77,7 @@ int main()
 
         //use shader programs defined in shader.h
         myShader.use();
-
+        myShader.setFloatUniform("scale", 0.5f);
         //bind VAO and draw
         vao1.bind();
 

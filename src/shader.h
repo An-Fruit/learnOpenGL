@@ -103,7 +103,7 @@ class Shader{
          * @param name the name of the uniform attribute we want to set
          * @param value the value we want to change the uniform attribute to 
         */
-        void setBool(const std::string &name, bool value) const{
+        void setBoolUniform(const std::string &name, bool value) const{
             glUniform1i(glGetUniformLocation(programID, name.c_str()), (int)value); 
         }
 
@@ -111,7 +111,7 @@ class Shader{
          * @param name the name of the uniform attribute we want to set
          * @param value the value we want to change the uniform attribute to 
         */
-        void setInt(const std::string &name, int value) const{
+        void setIntUniform(const std::string &name, int value) const{
             glUniform1i(glGetUniformLocation(programID, name.c_str()), value);
         }
 
@@ -119,7 +119,7 @@ class Shader{
          * @param name the name of the uniform attribute we want to set
          * @param value the value we want to change the uniform attribute to 
         */
-        void setFloat(const std::string &name, float value) const{
+        void setFloatUniform(const std::string &name, float value) const{
             glUniform1f(glGetUniformLocation(programID, name.c_str()), value);
         }
 
