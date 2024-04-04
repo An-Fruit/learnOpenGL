@@ -66,16 +66,16 @@ class Shader{
         }
 
         /**
-         * Deconstructor for the shader.
-         * Deletes the shader program when it goes out of scope
+         * deletes the shader program
+         * pre: none
+         * post: the shader program referenced by programID will be deleted
         */
-        ~Shader(){
-            if(programID != 0){
+        void destroy(){
+            if(programID != 0)
                 glDeleteProgram(programID);
-                programID = 0;
-            }
+            programID = 0;
         }
-        
+
         /**
          * @param vPath the path to the file w/ vertex shader source code
          * @param fPath the path to a file w/ fragment shader source code
