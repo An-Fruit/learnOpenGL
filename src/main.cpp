@@ -6,13 +6,21 @@
 #include <math.h>
 #include <vector>
 
+#include "stb_image.h"
 #include "shader.h"
 #include "VBO.h"
 #include "EBO.h"
 #include "VAO.h"
 
-#define MAX_SIERPINSKI_DEPTH 8      //change this to allow for more recursive depth for Sierpinski's Triangle
+typedef struct {
+    int width;
+    int height;
+    int channels;
+    unsigned char *bytes;
+} image_t;
 
+
+void loadImage(image_t *img, const char *path);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 GLFWwindow *startupGLFW();
@@ -50,7 +58,7 @@ int main()
     }    
 
     //get shader program from path specified
-    Shader myShader("VertexShader.glsl", "FragmentShader.glsl");
+    Shader myShader("resources/shaders/VertexShader.glsl", "resources/shaders/FragmentShader.glsl");
     
     VertArrObj vao1;
     vao1.bind();
@@ -63,6 +71,11 @@ int main()
     vao1.unbind();
     vbo1.unbind();
     ebo1.unbind();
+
+
+    //load texture image
+    image_t texture;
+    loadImage(&texture, "resources/textures/pop_cat.png");
 
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);   //uncomment to draw in wireframe mode
     //render loop
@@ -99,6 +112,16 @@ int main()
     // glfw: terminate, clearing all previously allocated GLFW resources.
     glfwTerminate();
     return 0;
+}
+
+/**
+ * function that loads an image with desired width/height/No. channels
+ * @param img pointer to the image we want to initialize
+ * @param path the path to the image that we want to load
+*/
+void loadImage(image_t *img, const char *path){
+    //loads the byte array with image data and then fills the remaining fields
+    img->bytes = stbi_load(path, &img->width, &img->height, &img->channels, 0);
 }
 
 
