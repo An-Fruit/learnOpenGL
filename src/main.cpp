@@ -58,8 +58,8 @@ int main()
     VertBufObj vbo1((float *)vertices, sizeof(vertices), GL_STATIC_DRAW);
     ElemBufObj ebo1((int *)drawOrder, sizeof(drawOrder), GL_STATIC_DRAW);
 
-    vao1.linkVBO(vbo1, 0, 6 * sizeof(float), 0);
-    vao1.linkVBO(vbo1, 1, 6 * sizeof(float), 3 * sizeof(float));
+    vao1.linkAttrib(vbo1, 0, 3, GL_FLOAT, 6 * sizeof(float), (void*) 0);
+    vao1.linkAttrib(vbo1, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
     vao1.unbind();
     vbo1.unbind();
     ebo1.unbind();

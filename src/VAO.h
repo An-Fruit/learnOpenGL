@@ -19,16 +19,16 @@ class VertArrObj{
     }
 
     /**
-     * links a vertex buffer object to the vertex array object
+     * sets up a vertex attribute
      * @param index specifies the index of the generic vertex attribute to be modified.
      * @param stride specifies the byte offset between consecutive generic vertex attributes. 
      * @param init_offset specifies a offset of the first component of the first generic vertex attribute in the array 
      *                    in the data store of the buffer currently bound to the GL_ARRAY_BUFFER target.
     */
-    void linkVBO(VertBufObj VBO, unsigned int index, unsigned int stride, unsigned int init_offset){
+    void linkAttrib(VertBufObj VBO, unsigned int layout, unsigned int numComponents, GLenum type, unsigned int stride, void* offset){
         VBO.bind();
-        glVertexAttribPointer(index, 3, GL_FLOAT, GL_FALSE, stride, (void*)init_offset);
-        glEnableVertexAttribArray(index);
+        glVertexAttribPointer(layout, numComponents, type, GL_FALSE, stride, offset);
+        glEnableVertexAttribArray(layout);
         VBO.unbind();
     }
 
