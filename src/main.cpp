@@ -6,6 +6,7 @@
 #include <math.h>
 #include <vector>
 
+#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include "shader.h"
 #include "VBO.h"
@@ -58,7 +59,7 @@ int main()
     }    
 
     //get shader program from path specified
-    Shader myShader("resources/shaders/VertexShader.glsl", "resources/shaders/FragmentShader.glsl");
+    Shader myShader("../resources/shaders/VertexShader.glsl", "../resources/shaders/FragmentShader.glsl");
     
     VertArrObj vao1;
     vao1.bind();
@@ -74,8 +75,8 @@ int main()
 
 
     //load texture image
-    image_t texture;
-    loadImage(&texture, "resources/textures/pop_cat.png");
+    // image_t texture;
+    // loadImage(&texture, "resources/textures/pop_cat.png");
 
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);   //uncomment to draw in wireframe mode
     //render loop

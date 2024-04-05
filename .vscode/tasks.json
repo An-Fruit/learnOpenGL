@@ -10,8 +10,8 @@
                 "-std=c++17",
                 "-I${workspaceFolder}/include",
                 "-L${workspaceFolder}/lib",
-                "${workspaceFolder}/src/main.cpp",
-                "${workspaceFolder}/src/glad.c",
+                "${workspaceFolder}/src/*.cpp",
+                "${workspaceFolder}/src/*.c",
                 "-lglfw3dll",
                 "-o",
                 "${workspaceFolder}/main.exe"

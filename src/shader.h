@@ -148,7 +148,7 @@ class Shader{
                 fContent = fileContentStream.str();
 
             } catch(std::ifstream::failure error){
-                printf("\nERROR TRYING TO READ IN FILE");
+                printf("\nERROR TRYING TO READ IN FILE AT PATH %s", path);
             }
             return fContent;
         }
