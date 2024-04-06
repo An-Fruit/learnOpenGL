@@ -25,7 +25,7 @@ class VertArrObj{
      * @param init_offset specifies a offset of the first component of the first generic vertex attribute in the array 
      *                    in the data store of the buffer currently bound to the GL_ARRAY_BUFFER target.
     */
-    void linkAttrib(VertBufObj VBO, unsigned int layout, unsigned int numComponents, GLenum type, unsigned int stride, void* offset){
+    void linkAttrib(VertBufObj &VBO, unsigned int layout, unsigned int numComponents, GLenum type, unsigned int stride, void* offset){
         VBO.bind();
         glVertexAttribPointer(layout, numComponents, type, GL_FALSE, stride, offset);
         glEnableVertexAttribArray(layout);
