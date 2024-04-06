@@ -6,22 +6,15 @@
 #include <math.h>
 #include <vector>
 
-#define STB_IMAGE_IMPLEMENTATION
+// #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include "shader.h"
 #include "VBO.h"
 #include "EBO.h"
 #include "VAO.h"
-
-typedef struct {
-    int width;
-    int height;
-    int channels;
-    unsigned char *bytes;
-} image_t;
+#include "texture.h"
 
 
-void loadImage(image_t *img, const char *path);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 GLFWwindow *startupGLFW();
@@ -29,17 +22,17 @@ GLFWwindow *startupGLFW();
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 800;
-const float vertices[] = {
-        //position              //color
-         0.5f,  0.5f, 0.0f,     0.0f, .25f, .25f,      // top right
-         0.5f, -0.5f, 0.0f,     0.0f, 1.0f, 1.0f,      // bottom right
-        -0.5f, -0.5f, 0.0f,     0.0f, 1.0f, 1.0f,      // bottom left
-        -0.5f,  0.5f, 0.0f,     0.0f, .25f, .25f       // top left 
+GLfloat vertices[] =
+{ //     COORDINATES     /        COLORS      /   TexCoord  //
+	-0.5f, -0.5f, 0.0f,     1.0f, 0.0f, 0.0f,	0.0f, 0.0f, // Lower left corner
+	-0.5f,  0.5f, 0.0f,     0.0f, 1.0f, 0.0f,	0.0f, 1.0f, // Upper left corner
+	 0.5f,  0.5f, 0.0f,     0.0f, 0.0f, 1.0f,	1.0f, 1.0f, // Upper right corner
+	 0.5f, -0.5f, 0.0f,     1.0f, 1.0f, 1.0f,	1.0f, 0.0f  // Lower right corner
 };
 
 const int drawOrder[] = {
-        0, 1, 3,  // first triangle
-        1, 2, 3   // second triangle
+        0, 2, 1,  // first triangle
+        0, 3, 2   // second triangle
 };
 
 int main()
@@ -67,16 +60,16 @@ int main()
     VertBufObj vbo1((float *)vertices, sizeof(vertices), GL_STATIC_DRAW);
     ElemBufObj ebo1((int *)drawOrder, sizeof(drawOrder), GL_STATIC_DRAW);
 
-    vao1.linkAttrib(vbo1, 0, 3, GL_FLOAT, 6 * sizeof(float), (void*) 0);
-    vao1.linkAttrib(vbo1, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    vao1.linkAttrib(vbo1, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*) 0);
+    vao1.linkAttrib(vbo1, 1, 3, GL_FLOAT, 8 * sizeof(float), (void*) (3 * sizeof(float)));
+    vao1.linkAttrib(vbo1, 2, 2, GL_FLOAT, 8 * sizeof(float), (void*) (6 * sizeof(float)));
     vao1.unbind();
     vbo1.unbind();
     ebo1.unbind();
 
 
-    //load texture image
-    // image_t texture;
-    // loadImage(&texture, "resources/textures/pop_cat.png");
+    Texture popCat( "../resources/textures/pop_cat.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+	popCat.texUnit(myShader, "tex0", 0);
 
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);   //uncomment to draw in wireframe mode
     //render loop
@@ -92,6 +85,8 @@ int main()
         //use shader programs defined in shader.h
         myShader.use();
         myShader.setFloatUniform("scale", 0.5f);
+        popCat.bind();
+
         //bind VAO and draw
         vao1.bind();
 
@@ -109,20 +104,12 @@ int main()
     vao1.destroy();
     vbo1.destroy();
     ebo1.destroy();
+    popCat.destroy();
+    myShader.destroy();
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     glfwTerminate();
     return 0;
-}
-
-/**
- * function that loads an image with desired width/height/No. channels
- * @param img pointer to the image we want to initialize
- * @param path the path to the image that we want to load
-*/
-void loadImage(image_t *img, const char *path){
-    //loads the byte array with image data and then fills the remaining fields
-    img->bytes = stbi_load(path, &img->width, &img->height, &img->channels, 0);
 }
 
 
