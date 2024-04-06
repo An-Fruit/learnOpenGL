@@ -1,12 +1,16 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 #include <vector>
 
-// #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include "shader.h"
 #include "VBO.h"
@@ -22,17 +26,25 @@ GLFWwindow *startupGLFW();
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 800;
-GLfloat vertices[] =
-{ //     COORDINATES     /        COLORS      /   TexCoord  //
-	-0.5f, -0.5f, 0.0f,     1.0f, 0.0f, 0.0f,	0.0f, 0.0f, // Lower left corner
-	-0.5f,  0.5f, 0.0f,     0.0f, 1.0f, 0.0f,	0.0f, 1.0f, // Upper left corner
-	 0.5f,  0.5f, 0.0f,     0.0f, 0.0f, 1.0f,	1.0f, 1.0f, // Upper right corner
-	 0.5f, -0.5f, 0.0f,     1.0f, 1.0f, 1.0f,	1.0f, 0.0f  // Lower right corner
+
+//vertex coordinates (pyramid)
+GLfloat vertices[] = {
+    //     COORDINATES     /        COLORS      /   TexCoord  //
+	-0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
+	-0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	5.0f, 0.0f,
+	 0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
+	 0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	5.0f, 0.0f,
+	 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	2.5f, 5.0f
 };
 
+// indices for vertices order
 const int drawOrder[] = {
-        0, 2, 1,  // first triangle
-        0, 3, 2   // second triangle
+	0, 1, 2,
+	0, 2, 3,
+	0, 1, 4,
+	1, 2, 4,
+	2, 3, 4,
+	3, 0, 4
 };
 
 int main()
@@ -63,13 +75,24 @@ int main()
     vao1.linkAttrib(vbo1, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*) 0);
     vao1.linkAttrib(vbo1, 1, 3, GL_FLOAT, 8 * sizeof(float), (void*) (3 * sizeof(float)));
     vao1.linkAttrib(vbo1, 2, 2, GL_FLOAT, 8 * sizeof(float), (void*) (6 * sizeof(float)));
+    //unbind VAO/VBO/EBO to prevent accidental modification
     vao1.unbind();
     vbo1.unbind();
     ebo1.unbind();
 
-
+    //initialize textures from given path
     Texture popCat( "../resources/textures/pop_cat.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 	popCat.texUnit(myShader, "tex0", 0);
+
+    Texture brick( "../resources/textures/brick.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+    brick.texUnit(myShader, "tex0", 0);
+
+    //rotation rate specification
+    float rotation = 0.0f;
+    double prevTime = glfwGetTime();
+
+    //enable depth buffer
+    glEnable(GL_DEPTH_TEST);
 
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);   //uncomment to draw in wireframe mode
     //render loop
@@ -78,19 +101,52 @@ int main()
         //process user input
         processInput(window);
 
-        //fill background
+        //specify background color
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        //clear color and depth buffers to prevent garbage from being drawnt o screen
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        //use shader programs defined in shader.h
+        //tell OpenGL state machine to use previously initialized shader
         myShader.use();
-        myShader.setFloatUniform("scale", 0.5f);
-        popCat.bind();
+
+        //increment rotation amount
+        double curTime = glfwGetTime();
+        if(curTime - prevTime >= 1.0f/60.0f){
+            rotation += 0.5f;
+            prevTime = curTime;
+        }
+
+        //initialize matrices to the identity matrix
+        glm::mat4 model = glm::mat4(1.0f);          //model matrix: transforms local coordinates to world coordinates
+        glm::mat4 view = glm::mat4(1.0f);           //view matrix: transforms world coordinates to view space
+        glm::mat4 projection = glm::mat4(1.0f);     //projection matrix: transforms view space into clip space
+
+        //rotate the object
+        model = glm::rotate(model, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
+        //move camera away from world coordinate origin
+        view = glm::translate(view, glm::vec3(0.0f, -0.5f, -2.0f));
+        //get perspective
+                                        //45 degree FOV     //aspect ratio              //closest   //farthest
+        projection = glm::perspective(glm::radians(45.0f), ((float)SCR_WIDTH)/SCR_HEIGHT, 0.1f, 100.0f);
+
+        //send values in the matrices to the vertex shader
+        int modelLoc = glGetUniformLocation(myShader.programID, "model");
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        int viewLoc = glGetUniformLocation(myShader.programID, "view");
+        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+        int projectionLoc = glGetUniformLocation(myShader.programID, "projection");
+        glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+        
+        //scale the vertices
+        myShader.setFloatUniform("scale", 1.0f);
+        //give it a texture
+        // popCat.bind();
+        brick.bind();
 
         //bind VAO and draw
         vao1.bind();
-
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, sizeof(drawOrder) / sizeof(int), GL_UNSIGNED_INT, 0);
 
  
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -100,7 +156,6 @@ int main()
     }
 
     //deallocate resources
-
     vao1.destroy();
     vbo1.destroy();
     ebo1.destroy();
